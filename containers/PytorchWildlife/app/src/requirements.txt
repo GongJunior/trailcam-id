@@ -103,7 +103,7 @@ toolz==0.12.1
 torch==1.10.1
 torchaudio==0.10.1
 torchvision==0.11.2
-tqdm==4.66.1
+tqdm==4.66.3
 traitlets==5.14.2
 typer==0.12.0
 typer-cli==0.12.0
