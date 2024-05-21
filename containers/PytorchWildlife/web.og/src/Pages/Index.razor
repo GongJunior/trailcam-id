@@ -1,0 +1,32 @@
+﻿@page "/"
+@inject IHttpClientFactory HttpClientFactory
+
+<PageTitle>Home</PageTitle>
+
+<h1>Video Home</h1>
+
+Welcome to your new app.
+
+<p>Test vid service</p>
+<p role="status">Vid Service Status: @serviceStatus</p>
+
+<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code {
+    private string serviceStatus = "Not tested";
+    protected override async Task OnInitializedAsync()
+    {
+        var client = HttpClientFactory.CreateClient("vidservice");
+        try
+        {
+            var response = await client.GetAsync("/");
+            serviceStatus = response.IsSuccessStatusCode ? "Service is up" : "Service is down";
+
+        }
+        catch (Exception e)
+        {
+            serviceStatus = $"Service is down: {e.Message}";
+        }
+    }
+
+}

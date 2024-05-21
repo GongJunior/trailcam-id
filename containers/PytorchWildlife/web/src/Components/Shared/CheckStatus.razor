@@ -1,0 +1,25 @@
+@inject IHttpClientFactory HttpClientFactory
+
+<p role="status">Vid Service Status: @serviceStatus</p>
+@code {
+    private string serviceStatus = "Not tested";
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+        var client = HttpClientFactory.CreateClient("vidservice");
+        try
+        {
+            var response = await client.GetAsync("/");
+            serviceStatus = response.IsSuccessStatusCode ? "Service is up" : "Service is down";
+        }
+        catch (Exception e)
+        {
+            serviceStatus = $"Service is down: {e.Message}";
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+}

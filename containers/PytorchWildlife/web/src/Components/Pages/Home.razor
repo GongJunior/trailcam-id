@@ -1,0 +1,51 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject IHttpClientFactory HttpClientFactory
+@inject ILogger<Home> Logger
+
+<PageTitle>VidID - Uploads</PageTitle>
+
+<h1>Vid Classifier</h1>
+
+<CheckStatus />
+
+<div>
+    <h2>Uploads</h2>
+    <button class="btn btn-primary" @onclick="UploadFiles">Click me</button>
+    <p role="status">Files Uploaded: @fileCount</p>
+    @if (uploadedFiles is null)
+    {
+        <p>No Uploaded Files</p>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>File Size</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var file in uploadedFiles)
+                {
+                    <tr>
+                        <td>@file.FileName</td>
+                        <td>@file.FileSize</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+
+@code {
+    private int fileCount = 0;
+    private UploadedFile[]? uploadedFiles;
+    private void UploadFiles()
+    {
+        fileCount++;
+    }
+    record UploadedFile(string FileName, long FileSize);
+}

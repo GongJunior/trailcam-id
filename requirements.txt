@@ -1,0 +1,6 @@
+click==8.1.7
+colorama==0.4.6
+numpy==1.26.4
+opencv-python==4.9.0.80
+pillow==10.2.0
+ruff==0.3.0

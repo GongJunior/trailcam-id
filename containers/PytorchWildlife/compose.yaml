@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    shm_size: 128mb
+    networks:
+      - backend-network
+    volumes:
+      - ./db:/data/db
+    environment:
+      POSTGRES_PASSWORD: /run/secrets/db_password
+    secrets:
+      - db_password
+
+  vidapp:
+    build: ./app
+    restart: always
+    networks:
+      - backend-network
+    expose:
+      - 8000
+    volumes:
+      - ./app/data:/db
+      - ./app/localStorage:/localStorage
+    working_dir: /app
+    entrypoint: [ "uvicorn", "main:app", "--host", "0.0.0.0" ]
+
+  web:
+    build: ./web
+    networks:
+      - frontend-network
+      - backend-network
+    ports:
+      - "8080:8080"
+
+networks:
+  backend-network:
+  frontend-network:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
