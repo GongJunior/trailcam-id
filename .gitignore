@@ -4,6 +4,7 @@ containers/PytorchWildlife/db
 videos/*
 images/*
 containers\PytorchWildlife\app\localStorage
+.vscode/
 
 
 # python
