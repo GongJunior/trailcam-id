@@ -2,6 +2,7 @@
 @rendermode InteractiveServer
 @inject IHttpClientFactory HttpClientFactory
 @inject ILogger<Library> Logger
+@using Microsoft.AspNetCore.Components.QuickGrid
 
 <PageTitle>VidID - Library</PageTitle>
 
@@ -17,31 +18,19 @@
     }
     else
     {
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>File Name</th>
-                    <th>Upload Date</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var vid in videos)
-                {
-                    <tr>
-                        <td>@vid.FileName</td>
-                        <td>@vid.UploadDate</td>
-                        <td>@vid.Status</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="grid">
+            <QuickGrid Items="@videos">
+                <PropertyColumn Title="File Name" Property="@(c => c.FileName)" />
+                <PropertyColumn Title="Upload Date" Property="@(c => c.UploadDate)" Sortable="true" />
+                <PropertyColumn Title="Status" Property="@(c => c.Status)" Sortable="true" />
+            </QuickGrid>
+        </div>
     }
 </div>
 
 @code {
     private string libraryMessage = "Retrieving Library...";
-    private Video[]? videos;
+    private IQueryable<Video>? videos;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender)
@@ -53,7 +42,7 @@
             //if (!response.IsSuccessStatusCode)
             //throw new Exception("Failed to retrieve library");
             //videos = await response.Content.ReadFromJsonAsync<Video[]>();
-            await AddData();
+            videos = await AddData();
         }
         catch (Exception e)
         {
@@ -64,10 +53,10 @@
             StateHasChanged();
         }
     }
-    async Task AddData()
+    async Task<IQueryable<Video>> AddData()
     {
         await Task.Delay(3000);
-        videos = [
+        return new List<Video> {
         new ("video1.mp4", new (2021, 10, 1), "Processing", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
         new ("video2.mp4", new (2021, 10, 2), "Complete", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
         new ("video3.mp4", new (2021, 10, 3), "Processing", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
@@ -75,7 +64,7 @@
         new ("video5.mp4", new (2021, 10, 5), "Processing", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
         new ("video6.mp4", new (2021, 10, 6), "Complete", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
         new ("video7.mp4", new (2021, 10, 7), "Processing", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
-        ];
+        }.AsQueryable();
     }
     record IdentifiedAnimal(decimal Confidence, string Name);
     record Video(string FileName, DateOnly UploadDate, string Status, IdentifiedAnimal[]? IdentifiedAnimals = null);
