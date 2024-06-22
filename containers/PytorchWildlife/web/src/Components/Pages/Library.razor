@@ -4,6 +4,11 @@
 @inject ILogger<Library> Logger
 @using Microsoft.AspNetCore.Components.QuickGrid
 
+@implements IDisposable
+@using Microsoft.EntityFrameworkCore
+@using Homebase.DataAccess
+@inject IDbContextFactory<WildlifeContext> DbFactory
+
 <PageTitle>VidID - Library</PageTitle>
 
 <h1>Vid Classifier</h1>
@@ -12,17 +17,18 @@
 
 <div>
     <h2>Library</h2>
-    @if (videos is null)
+    @if (_context is null)
     {
         <p>@libraryMessage</p>
     }
     else
     {
         <div class="grid">
-            <QuickGrid Items="@videos">
-                <PropertyColumn Title="File Name" Property="@(c => c.FileName)" />
-                <PropertyColumn Title="Upload Date" Property="@(c => c.UploadDate)" Sortable="true" />
-                <PropertyColumn Title="Status" Property="@(c => c.Status)" Sortable="true" />
+            <QuickGrid Items="@_context.VideoStatusAnimalConfidences">
+                <PropertyColumn Title="Name" Property="@( v => v.VideoName)" Sortable="true" />
+                <PropertyColumn Title="Status" Property="@( v => v.Status)" Sortable="true" />
+                <PropertyColumn Title="Animal Name" Property="@( v => v.AnimalName)" Sortable="true" />
+                <PropertyColumn Title="Confidence" Property="@( v => v.AverageConfidence)" Sortable="true" />
             </QuickGrid>
         </div>
     }
@@ -30,42 +36,16 @@
 
 @code {
     private string libraryMessage = "Retrieving Library...";
-    private IQueryable<Video>? videos;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private WildlifeContext? _context;
+    private HttpClient? _client;
+    protected override async Task OnInitializedAsync()
     {
-        if (!firstRender)
-            return;
-        var client = HttpClientFactory.CreateClient("vidservice");
-        try
-        {
-            //var response = await client.GetAsync("/library");
-            //if (!response.IsSuccessStatusCode)
-            //throw new Exception("Failed to retrieve library");
-            //videos = await response.Content.ReadFromJsonAsync<Video[]>();
-            videos = await AddData();
-        }
-        catch (Exception e)
-        {
-            libraryMessage = $"Error: {e.Message}";
-        }
-        finally
-        {
-            StateHasChanged();
-        }
+        _context = await DbFactory.CreateDbContextAsync();
+        _client = HttpClientFactory.CreateClient("vidservice");
     }
-    async Task<IQueryable<Video>> AddData()
+    public void Dispose()
     {
-        await Task.Delay(3000);
-        return new List<Video> {
-        new ("video1.mp4", new (2021, 10, 1), "Processing", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
-        new ("video2.mp4", new (2021, 10, 2), "Complete", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
-        new ("video3.mp4", new (2021, 10, 3), "Processing", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
-        new ("video4.mp4", new (2021, 10, 4), "Complete", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
-        new ("video5.mp4", new (2021, 10, 5), "Processing", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
-        new ("video6.mp4", new (2021, 10, 6), "Complete", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
-        new ("video7.mp4", new (2021, 10, 7), "Processing", [new (0.9m, "Dog"), new (0.8m, "Cat")]),
-        }.AsQueryable();
-    }
-    record IdentifiedAnimal(decimal Confidence, string Name);
-    record Video(string FileName, DateOnly UploadDate, string Status, IdentifiedAnimal[]? IdentifiedAnimals = null);
+        _context?.Dispose();
+        Logger.LogInformation("Library page disposed");
+    }   
 }
