@@ -174,3 +174,4 @@ cython_debug/
 # csharp
 bin/
 obj/
+appsettings.Development.json

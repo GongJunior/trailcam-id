@@ -9,8 +9,15 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddQuickGridEntityFrameworkAdapter();
 builder.Services.AddHttpClient("vidservice", httpClient => httpClient.BaseAddress = new Uri("http://vidapp:8000/"));
+
+var connectionString = (builder.Configuration
+    .GetConnectionString("DefaultConnection") 
+    ?? Environment.GetEnvironmentVariable("wldb")) 
+    ?? throw new InvalidOperationException("No connection string found.");
+
+Console.WriteLine($"Using connection string: {connectionString}");
 builder.Services.AddDbContextFactory<WildlifeContext>(options =>
-    options.UseSqlite("Data Source=C:\\Users\\antho\\repos\\trailcam-id\\containers\\PytorchWildlife\\app\\data\\wildlife.db"));
+    options.UseSqlite($"Data Source={connectionString}"));
 
 
 var app = builder.Build();
