@@ -175,3 +175,5 @@ cython_debug/
 bin/
 obj/
 appsettings.Development.json
+.vs/
+*.csproj.user
