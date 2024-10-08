@@ -100,7 +100,7 @@ termcolor==2.4.0
 thop==0.1.1.post2209072238
 tomlkit==0.12.0
 toolz==0.12.1
-torch==1.13.1
+torch==2.2.0
 torchaudio==0.10.1
 torchvision==0.11.2
 tqdm==4.66.3
