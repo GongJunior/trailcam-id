@@ -24,7 +24,7 @@ fonttools==4.50.0
 fsspec==2024.3.1
 google-auth==2.29.0
 google-auth-oauthlib==1.0.0
-gradio==4.36.1
+gradio==5.0.0
 gradio_client==0.7.1
 greenlet==3.0.3
 grpcio==1.62.1
